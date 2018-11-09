@@ -225,15 +225,22 @@ public class MasterServer extends UnicastRemoteObject implements MasterServerInt
 
         long a = System.currentTimeMillis();
 
-        BloomFilter filter = new BloomFilter(7000000, service2.getDataSize() + service3.getDataSize());
+        System.out.println(service1.getDataSize());
+        System.out.println(service2.getDataSize());
+        System.out.println(service3.getDataSize());
+
+        BloomFilter filter = new BloomFilter(28000000, service1.getDataSize());
         service1.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
         service2.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
         service3.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
 
-
+        System.out.println("0");
         boolean[] bf1 = service1.getBF();
+        System.out.println("A");
         boolean[] bf2 = service2.getBF();
+        System.out.println("B");
         boolean[] bf3 = service3.getBF();
+        System.out.println("C");
         boolean[] bf = new boolean[bf2.length];
 
         for (int i=0; i<bf1.length; i++) {
