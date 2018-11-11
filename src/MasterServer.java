@@ -61,15 +61,16 @@ public class MasterServer extends UnicastRemoteObject implements MasterServerInt
         executor.shutdown();
     }*/
 
-    public void setup(String folder) throws RemoteException, MalformedURLException, NotBoundException {
+    @Override
+    public void lookupSubServers() throws RemoteException, MalformedURLException, NotBoundException {
     
     	service1 = (SubServerInterface) Naming.lookup("rmi://localhost:5099/sub1");
         service2 = (SubServerInterface) Naming.lookup("rmi://localhost:5098/sub2");
         service3 = (SubServerInterface) Naming.lookup("rmi://localhost:5097/sub3");
 
-        service1.readData1("./" + folder + "/table1.csv");
-        service2.readData2("./" + folder + "/table2.csv");
-        service3.readData2("./" + folder + "/table3.csv");
+//        service1.readData1("./" + folder + "/table1.csv");
+//        service2.readData2("./" + folder + "/table2.csv");
+//        service3.readData2("./" + folder + "/table3.csv");
     }
 
     private ArrayList<DataTuple3> join(ArrayList<DataTuple1> data1, ArrayList<DataTuple2> data2) {
@@ -221,7 +222,7 @@ public class MasterServer extends UnicastRemoteObject implements MasterServerInt
     }
 
     @Override
-    public ArrayList<DataTuple3> doRealJoin() throws MalformedURLException, RemoteException, NotBoundException {
+    public ArrayList<DataTuple3> doBFJoin() throws MalformedURLException, RemoteException, NotBoundException {
 
         long a = System.currentTimeMillis();
 
@@ -229,18 +230,14 @@ public class MasterServer extends UnicastRemoteObject implements MasterServerInt
         System.out.println(service2.getDataSize());
         System.out.println(service3.getDataSize());
 
-        BloomFilter filter = new BloomFilter(28000000, service1.getDataSize());
+        BloomFilter filter = new BloomFilter(20000000, service1.getDataSize());
         service1.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
         service2.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
         service3.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
 
-        System.out.println("0");
         boolean[] bf1 = service1.getBF();
-        System.out.println("A");
         boolean[] bf2 = service2.getBF();
-        System.out.println("B");
         boolean[] bf3 = service3.getBF();
-        System.out.println("C");
         boolean[] bf = new boolean[bf2.length];
 
         for (int i=0; i<bf1.length; i++) {

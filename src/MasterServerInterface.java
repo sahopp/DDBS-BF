@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public interface MasterServerInterface extends Remote {
 
-	void setup(String folder) throws MalformedURLException, RemoteException, NotBoundException;
+    void lookupSubServers() throws RemoteException, MalformedURLException, NotBoundException;
 
     ArrayList<DataTuple3> do12Join() throws MalformedURLException, RemoteException, NotBoundException;
     
@@ -16,5 +16,5 @@ public interface MasterServerInterface extends Remote {
     
     ArrayList<DataTuple3> doUnionJoin() throws MalformedURLException, RemoteException, NotBoundException;
 
-    ArrayList<DataTuple3> doRealJoin() throws MalformedURLException, RemoteException, NotBoundException;
+    ArrayList<DataTuple3> doBFJoin() throws MalformedURLException, RemoteException, NotBoundException;
 }
