@@ -26,9 +26,11 @@ public class SubServer extends UnicastRemoteObject implements SubServerInterface
     }
 
     public boolean[] getBF() throws RemoteException{
+        System.out.println("Hashing Data into BloomFilter...");
         for (DataTuple z:data) {
             this.filter.add(z.getA1());
         }
+        System.out.println("Hashing complete!\n");
         return this.filter.getFilter();
     }
 
@@ -37,16 +39,19 @@ public class SubServer extends UnicastRemoteObject implements SubServerInterface
     }
 
     public ArrayList<DataTuple> getFilteredData(boolean[] bf){
+        System.out.println("Filtering Data...");
         ArrayList<DataTuple> result =  new ArrayList<>();
 
         this.filter.setFilter(bf);
         for (DataTuple z:data) {
             if (this.filter.check(z.getA1())) {result.add(z);}
         }
+        System.out.println("Filtering complete!\n");
         return result;
     }
     
     public ArrayList<DataTuple> getData() throws RemoteException{
+        System.out.println("Return Data\n");
     	return this.data;	
     }
     

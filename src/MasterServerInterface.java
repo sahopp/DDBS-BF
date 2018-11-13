@@ -17,4 +17,6 @@ public interface MasterServerInterface extends Remote {
     ArrayList<DataTuple3> doUnionJoin() throws MalformedURLException, RemoteException, NotBoundException;
 
     ArrayList<DataTuple3> doBFJoin() throws MalformedURLException, RemoteException, NotBoundException;
+
+    ArrayList<DataTuple3> doBF1Join() throws MalformedURLException, RemoteException, NotBoundException;
 }

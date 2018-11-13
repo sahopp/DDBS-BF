@@ -109,22 +109,17 @@ public class MasterServer extends UnicastRemoteObject implements MasterServerInt
 
     @Override
     public ArrayList<DataTuple3> doNaiveJoin()  throws MalformedURLException, RemoteException, NotBoundException {
-        
-        
-        long a = System.currentTimeMillis();
-        
+
+        System.out.println("Process Naive Join");
+        System.out.println("Receive Data from SubServers...");
         ArrayList<DataTuple1> dt1 = service1.getData();
         ArrayList<DataTuple2> dt2 = service2.getData();
         ArrayList<DataTuple2> dt3 = service3.getData();
         dt2.addAll(dt3);
 
-        System.out.println("Naive Sizes: " + dt1.size() + " and " + dt2.size());
-
+        System.out.println("Perform Join...");
         ArrayList<DataTuple3> j = join(dt1, dt2);
-        
-        long time = System.currentTimeMillis()-a;
-        System.out.println("Naive time to get Data and join: " + time);
-        
+        System.out.println("Join complete!\nReturn result\n");
         return j;
     }
 
@@ -152,13 +147,13 @@ public class MasterServer extends UnicastRemoteObject implements MasterServerInt
         }
         return q;
     }
-    
+
     @Override
     public ArrayList<DataTuple3> doIntersectionJoin()  throws MalformedURLException, RemoteException, NotBoundException {
 
-        
+
         long a = System.currentTimeMillis();
-        
+
         BloomFilter filter = new BloomFilter(3500, service2.getDataSize() + service3.getDataSize());
         service1.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
         service2.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
@@ -170,29 +165,29 @@ public class MasterServer extends UnicastRemoteObject implements MasterServerInt
         for (int i=0; i<bf2.length; i++) {
         	bf[i] = bf2[i] && bf3[i];
         }
-        
+
         ArrayList<DataTuple1> dt1 = service1.getFilteredData(bf);
         ArrayList<DataTuple2> dt2 = service2.getData();
         ArrayList<DataTuple2> dt3 = service3.getData();
         dt2.addAll(dt3);
-        
+
         ArrayList<DataTuple3> q = join(dt1, dt2);
-        
+
         long time = System.currentTimeMillis()-a;
         //System.out.println(time);
-        
+
         for (DataTuple z : dt2) {
             //z.print();
         }
         return q;
     }
-    
+
     @Override
     public ArrayList<DataTuple3> doUnionJoin()  throws MalformedURLException, RemoteException, NotBoundException {
 
 
         long a = System.currentTimeMillis();
-        
+
         BloomFilter filter = new BloomFilter(3500, service2.getDataSize() + service3.getDataSize());
         service1.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
         service2.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
@@ -204,17 +199,17 @@ public class MasterServer extends UnicastRemoteObject implements MasterServerInt
         for (int i=0; i<bf2.length; i++) {
         	bf[i] = bf2[i] || bf3[i];
         }
-        
+
         ArrayList<DataTuple1> dt1 = service1.getFilteredData(bf);
         ArrayList<DataTuple2> dt2 = service2.getData();
         ArrayList<DataTuple2> dt3 = service3.getData();
         dt2.addAll(dt3);
-        
+
         ArrayList<DataTuple3> q = join(dt1, dt2);
-        
+
         long time = System.currentTimeMillis()-a;
         //System.out.println(time);
-        
+
         for (DataTuple z : dt2) {
             //z.print();
         }
@@ -224,17 +219,13 @@ public class MasterServer extends UnicastRemoteObject implements MasterServerInt
     @Override
     public ArrayList<DataTuple3> doBFJoin() throws MalformedURLException, RemoteException, NotBoundException {
 
-        long a = System.currentTimeMillis();
-
-        System.out.println(service1.getDataSize());
-        System.out.println(service2.getDataSize());
-        System.out.println(service3.getDataSize());
-
-        BloomFilter filter = new BloomFilter(20000000, service1.getDataSize());
+        System.out.println("Process BloomFilter Join");
+        BloomFilter filter = new BloomFilter(20000000, 2233333);
         service1.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
         service2.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
         service3.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
 
+        System.out.println("Wait for BloomFilters...");
         boolean[] bf1 = service1.getBF();
         boolean[] bf2 = service2.getBF();
         boolean[] bf3 = service3.getBF();
@@ -243,27 +234,48 @@ public class MasterServer extends UnicastRemoteObject implements MasterServerInt
         for (int i=0; i<bf1.length; i++) {
             bf[i] = bf1[i] && (bf2[i] || bf3[i]);
         }
-        long time = System.currentTimeMillis()-a;
-        System.out.println("Real Time to get BFs: " + time);
-        long b = System.currentTimeMillis();
 
-
+        System.out.println("Receive filtered Data from SubServers...");
         ArrayList<DataTuple1> dt1 = service1.getFilteredData(bf);
         ArrayList<DataTuple2> dt2 = service2.getFilteredData(bf);
         ArrayList<DataTuple2> dt3 = service3.getFilteredData(bf);
         dt2.addAll(dt3);
 
-        System.out.println("Real Sizes: " + dt1.size() + " and " + dt2.size());
-        ArrayList<DataTuple3> q = join(dt1, dt2);
+        System.out.println("Perform join...");
+        ArrayList<DataTuple3> j = join(dt1, dt2);
+        System.out.println("Join complete!\nReturn result\n");
+        return j;
+    }
 
-        long time2 = System.currentTimeMillis()-b;
-        System.out.println("Real Time to get Data and join: " + time2);
-        //System.out.println(time);
+    @Override
+    public ArrayList<DataTuple3> doBF1Join() throws MalformedURLException, RemoteException, NotBoundException {
 
-        for (DataTuple z : dt2) {
-            //z.print();
+        System.out.println("Process BloomFilter Join");
+        BloomFilter filter = new BloomFilter(20000000, 2233333);
+        service1.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
+        service2.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
+        service3.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
+
+        System.out.println("Wait for BloomFilters...");
+        boolean[] bf1 = service1.getBF();
+        boolean[] bf2 = service2.getBF();
+        boolean[] bf3 = service3.getBF();
+        boolean[] bf23 = new boolean[bf2.length];
+
+        for (int i=0; i<bf1.length; i++) {
+            bf23[i] = bf2[i] || bf3[i];
         }
-        return q;
+
+        System.out.println("Receive filtered Data from SubServers...");
+        ArrayList<DataTuple1> dt1 = service1.getFilteredData(bf23);
+        ArrayList<DataTuple2> dt2 = service2.getFilteredData(bf1);
+        ArrayList<DataTuple2> dt3 = service3.getFilteredData(bf1);
+        dt2.addAll(dt3);
+
+        System.out.println("Perform join...");
+        ArrayList<DataTuple3> j = join(dt1, dt2);
+        System.out.println("Join complete!\nReturn result\n");
+        return j;
     }
 
 }
