@@ -124,10 +124,10 @@ public class MasterServer extends UnicastRemoteObject implements MasterServerInt
     }
 
     @Override
-    public ArrayList<DataTuple3> doBFJoin() throws MalformedURLException, RemoteException, NotBoundException {
+    public ArrayList<DataTuple3> doBFJoin(int m) throws MalformedURLException, RemoteException, NotBoundException {
 
         System.out.println("Process BloomFilter Join");
-        BloomFilter filter = new BloomFilter(20000000, 2233333);
+        BloomFilter filter = new BloomFilter(m, Math.max(service1.getDataSize(), service2.getDataSize() + service3.getDataSize()));
         service1.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
         service2.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
         service3.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());

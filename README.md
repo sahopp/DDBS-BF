@@ -8,7 +8,7 @@ Servers:
 172.23.93.120 Subserver3
 
 
-Access Server: ssh ubuntu@IP
+Access Server: ssh ubuntu@172.23.93.116
 
 Transfer Directory: scp -r <path> ubuntu@IP:~/<path>
 Transfer File: scp <path>/file.txt ubuntu@IP:~/<path>/file.txt
