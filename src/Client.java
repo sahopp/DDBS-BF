@@ -11,7 +11,7 @@ public class Client {
 
         MasterServerInterface master = (MasterServerInterface) Naming.lookup("rmi://localhost:5096/master");
 
-        int m = 2000000;
+        int m = 20000000;
             System.out.println("\nDo BloomFilter Join...");
             long a = System.currentTimeMillis();
         ArrayList<DataTuple3> DataBF = master.doBFJoin(m);

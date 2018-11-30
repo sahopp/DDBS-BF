@@ -7,7 +7,7 @@ public class RandomPrime
 {
     public int generate(int min){
         Random ran = new SecureRandom();
-        BigInteger a = BigInteger.probablePrime((int) (Math.log(min)/Math.log(2))+5, ran);
+        BigInteger a = BigInteger.probablePrime((int) (Math.log(min)/Math.log(2))+4, ran);
         return a.intValue();
     }
 }
