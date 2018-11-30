@@ -110,29 +110,33 @@ public class MasterServer extends UnicastRemoteObject implements MasterServerInt
     @Override
     public ArrayList<DataTuple3> doNaiveJoin()  throws MalformedURLException, RemoteException, NotBoundException {
 
-        System.out.println("Process Naive Join");
-        System.out.println("Receive Data from SubServers...");
+
+        long a = System.currentTimeMillis();
         ArrayList<DataTuple1> dt1 = service1.getData();
         ArrayList<DataTuple2> dt2 = service2.getData();
         ArrayList<DataTuple2> dt3 = service3.getData();
         dt2.addAll(dt3);
+        System.out.println("Naive data receiving: " + (System.currentTimeMillis() - a));
 
-        System.out.println("Perform Join...");
+        a = System.currentTimeMillis();
         ArrayList<DataTuple3> j = join(dt1, dt2);
-        System.out.println("Join complete!\nReturn result\n");
+        System.out.println("Naive joining: " + (System.currentTimeMillis() - a) + "\n");
         return j;
     }
 
     @Override
     public ArrayList<DataTuple3> doBFJoin(int m) throws MalformedURLException, RemoteException, NotBoundException {
 
-        System.out.println("Process BloomFilter Join");
+        long a = System.currentTimeMillis();
         BloomFilter filter = new BloomFilter(m, Math.max(service1.getDataSize(), service2.getDataSize() + service3.getDataSize()));
         service1.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
         service2.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
         service3.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
 
-        System.out.println("Wait for BloomFilters...");
+        System.out.println("m = " + m + ", Konfig: " + (System.currentTimeMillis() - a));
+
+        a = System.currentTimeMillis();
+
         boolean[] bf1 = service1.getBF();
         boolean[] bf2 = service2.getBF();
         boolean[] bf3 = service3.getBF();
@@ -142,15 +146,21 @@ public class MasterServer extends UnicastRemoteObject implements MasterServerInt
             bf23[i] = bf2[i] || bf3[i];
         }
 
-        System.out.println("Receive filtered Data from SubServers...");
+        System.out.println("m = " + m + ", getBF: " + (System.currentTimeMillis() - a));
+
+        a = System.currentTimeMillis();
         ArrayList<DataTuple1> dt1 = service1.getFilteredData(bf23);
         ArrayList<DataTuple2> dt2 = service2.getFilteredData(bf1);
         ArrayList<DataTuple2> dt3 = service3.getFilteredData(bf1);
         dt2.addAll(dt3);
 
-        System.out.println("Perform join...");
+        System.out.println("m = " + m + ", get Data: " + (System.currentTimeMillis() - a));
+
+        a = System.currentTimeMillis();
+
         ArrayList<DataTuple3> j = join(dt1, dt2);
-        System.out.println("Join complete!\nReturn result\n");
+        System.out.println("m = " + m + ", join: " + (System.currentTimeMillis() - a) + "\n");
+
         return j;
     }
 }

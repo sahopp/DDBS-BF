@@ -26,7 +26,7 @@ public class Experiment {
 
             final int NUMBER_OF_ROUNDS = 10;
             final int Min_VAL = 1;
-            final int MAX_VAL = 30;
+            final int MAX_VAL = 2;
             int m;
             long a;
             long time;
