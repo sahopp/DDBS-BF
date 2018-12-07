@@ -8,7 +8,6 @@ import java.rmi.registry.Registry;
 public class ApplicationServer {
 
     public static void main(String[] args) throws RemoteException, MalformedURLException, NotBoundException {
-        // TODO Auto-generated method stub
 
         String folder = "CSV";
 
@@ -31,8 +30,8 @@ public class ApplicationServer {
         ((SubServerInterface) Naming.lookup("rmi://localhost:5098/sub2")).readData2("./" + folder + "/table2.csv");
         ((SubServerInterface) Naming.lookup("rmi://localhost:5097/sub3")).readData2("./" + folder + "/table3.csv");
         ((MasterServerInterface) Naming.lookup("rmi://localhost:5096/master")).lookupSubServers();
-        System.out.println("\nApplication started!");
 
+        System.out.println("\nApplication started!");
     }
 
 }

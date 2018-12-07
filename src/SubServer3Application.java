@@ -8,7 +8,6 @@ import java.rmi.registry.Registry;
 public class SubServer3Application {
 
     public static void main(String[] args) throws RemoteException, MalformedURLException, NotBoundException {
-        // TODO Auto-generated method stub
 
         String folder = "CSV";
 

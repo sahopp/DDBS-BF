@@ -1,5 +1,4 @@
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -10,22 +9,16 @@ public class SubServer extends UnicastRemoteObject implements SubServerInterface
 
     protected SubServer() throws RemoteException {
         super();
-        // TODO Auto-generated constructor stub
     }
 
     private ArrayList<DataTuple> data;
     private BloomFilter filter;
 
-
-    public void putData(ArrayList<DataTuple> a) throws RemoteException{
-        this.data = a;
-    }
-
-    public void setFilterConfig(int m, int p, int[] a, int[] b) throws RemoteException{
+    public void setFilterConfig(int m, int p, int[] a, int[] b) {
         this.filter = new BloomFilter(m, p, a, b);
     }
 
-    public boolean[] getBF() throws RemoteException{
+    public boolean[] getBF() {
         System.out.println("Hashing Data into BloomFilter...");
         for (DataTuple z:data) {
             this.filter.add(z.getA1());
@@ -34,7 +27,7 @@ public class SubServer extends UnicastRemoteObject implements SubServerInterface
         return this.filter.getFilter();
     }
 
-    public int getDataSize() throws RemoteException{
+    public int getDataSize() {
         return this.data.size();
     }
 
@@ -50,16 +43,16 @@ public class SubServer extends UnicastRemoteObject implements SubServerInterface
         return result;
     }
     
-    public ArrayList<DataTuple> getData() throws RemoteException{
+    public ArrayList<DataTuple> getData() {
         System.out.println("Return Data\n");
     	return this.data;	
     }
     
-    public void readData1(String path) throws RemoteException{
+    public void readData1(String path) {
     	
     	ArrayList<DataTuple> data = new ArrayList<>();
         BufferedReader br = null;
-        String line = "";
+        String line;
         String cvsSplitBy = ";";
 
         try {
@@ -68,11 +61,9 @@ public class SubServer extends UnicastRemoteObject implements SubServerInterface
 
             while ((line = br.readLine()) != null) {
             	
-                // use comma as separator
                 String[] table = line.split(cvsSplitBy);
                 DataTuple1 tuple = new DataTuple1(Integer.parseInt(table[0]),table[1], table[2]);
                 data.add(tuple);
-                //System.out.println(table1[1]);
             }
 
         } catch (IOException e) {
@@ -89,11 +80,11 @@ public class SubServer extends UnicastRemoteObject implements SubServerInterface
         this.data = data;
     }
     
-public void readData2(String path) throws RemoteException{
+public void readData2(String path) {
     	
     	ArrayList<DataTuple> data = new ArrayList<>();
         BufferedReader br = null;
-        String line = "";
+        String line;
         String cvsSplitBy = ";";
 
         try {
@@ -102,11 +93,9 @@ public void readData2(String path) throws RemoteException{
 
             while ((line = br.readLine()) != null) {
             	
-                // use comma as separator
                 String[] table = line.split(cvsSplitBy);
                 DataTuple2 tuple = new DataTuple2(Integer.parseInt(table[0]), Integer.parseInt(table[1]), table[2]);
                 data.add(tuple);
-                //System.out.println(table1[1]);
             }
 
         } catch (IOException e) {

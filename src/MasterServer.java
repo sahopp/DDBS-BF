@@ -1,7 +1,3 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -9,9 +5,6 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 
 public class MasterServer extends UnicastRemoteObject implements MasterServerInterface {
@@ -22,44 +15,7 @@ public class MasterServer extends UnicastRemoteObject implements MasterServerInt
 	
     protected MasterServer() throws RemoteException {
         super();
-        // TODO Auto-generated constructor stub
     }
-
-    /*public void setup(String folder) throws RemoteException, MalformedURLException, NotBoundException {
-
-        service1 = (SubServerInterface) Naming.lookup("rmi://localhost:5099/sub1");
-        service2 = (SubServerInterface) Naming.lookup("rmi://localhost:5098/sub2");
-        service3 = (SubServerInterface) Naming.lookup("rmi://localhost:5097/sub3");
-
-        ExecutorService executor = Executors.newFixedThreadPool(3);
-        executor.execute(() -> {
-            try {
-                service1.readData1("./CSVnoIntersect/table1.csv");
-                //System.out.println(1);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        });
-
-        executor.execute(() -> {
-            try {
-                service2.readData2("./CSVnoIntersect/table2.csv");
-                //System.out.println(2);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        });
-
-        executor.execute(() -> {
-            try {
-                service3.readData2("./CSVnoIntersect/table3.csv");
-                //System.out.println(3);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        });
-        executor.shutdown();
-    }*/
 
     @Override
     public void lookupSubServers() throws RemoteException, MalformedURLException, NotBoundException {
@@ -67,10 +23,6 @@ public class MasterServer extends UnicastRemoteObject implements MasterServerInt
     	service1 = (SubServerInterface) Naming.lookup("rmi://localhost:5099/sub1");
         service2 = (SubServerInterface) Naming.lookup("rmi://localhost:5098/sub2");
         service3 = (SubServerInterface) Naming.lookup("rmi://localhost:5097/sub3");
-
-//        service1.readData1("./" + folder + "/table1.csv");
-//        service2.readData2("./" + folder + "/table2.csv");
-//        service3.readData2("./" + folder + "/table3.csv");
     }
 
     private ArrayList<DataTuple3> join(ArrayList<DataTuple1> data1, ArrayList<DataTuple2> data2) {
@@ -106,37 +58,31 @@ public class MasterServer extends UnicastRemoteObject implements MasterServerInt
         return result;
     }
 
-
     @Override
-    public ArrayList<DataTuple3> doNaiveJoin()  throws MalformedURLException, RemoteException, NotBoundException {
+    public ArrayList<DataTuple3> doNaiveJoin()  throws RemoteException {
 
-
-        long a = System.currentTimeMillis();
+        System.out.println("Receive Data from SubServers...");
         ArrayList<DataTuple1> dt1 = service1.getData();
         ArrayList<DataTuple2> dt2 = service2.getData();
         ArrayList<DataTuple2> dt3 = service3.getData();
         dt2.addAll(dt3);
-        System.out.println("Naive data receiving: " + (System.currentTimeMillis() - a));
 
-        a = System.currentTimeMillis();
+        System.out.println("Join Relations...");
         ArrayList<DataTuple3> j = join(dt1, dt2);
-        System.out.println("Naive joining: " + (System.currentTimeMillis() - a) + "\n");
+        System.out.println("Send Result to Client...\n");
         return j;
     }
 
     @Override
-    public ArrayList<DataTuple3> doBFJoin(int m) throws MalformedURLException, RemoteException, NotBoundException {
+    public ArrayList<DataTuple3> doBFJoin(int m) throws RemoteException {
 
-        long a = System.currentTimeMillis();
+        System.out.println("Set up Bloom Filter Configuration...");
         BloomFilter filter = new BloomFilter(m, Math.max(service1.getDataSize(), service2.getDataSize() + service3.getDataSize()));
         service1.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
         service2.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
         service3.setFilterConfig(filter.getM(), filter.getP(), filter.getA(), filter.getB());
 
-        System.out.println("m = " + m + ", Konfig: " + (System.currentTimeMillis() - a));
-
-        a = System.currentTimeMillis();
-
+        System.out.println("Receive Bloom Filters from SubServers...");
         boolean[] bf1 = service1.getBF();
         boolean[] bf2 = service2.getBF();
         boolean[] bf3 = service3.getBF();
@@ -146,21 +92,15 @@ public class MasterServer extends UnicastRemoteObject implements MasterServerInt
             bf23[i] = bf2[i] || bf3[i];
         }
 
-        System.out.println("m = " + m + ", getBF: " + (System.currentTimeMillis() - a));
-
-        a = System.currentTimeMillis();
+        System.out.println("Receive filtered Data from SubServers...");
         ArrayList<DataTuple1> dt1 = service1.getFilteredData(bf23);
         ArrayList<DataTuple2> dt2 = service2.getFilteredData(bf1);
         ArrayList<DataTuple2> dt3 = service3.getFilteredData(bf1);
         dt2.addAll(dt3);
 
-        System.out.println("m = " + m + ", get Data: " + (System.currentTimeMillis() - a));
-
-        a = System.currentTimeMillis();
-
+        System.out.println("Join Relations...");
         ArrayList<DataTuple3> j = join(dt1, dt2);
-        System.out.println("m = " + m + ", join: " + (System.currentTimeMillis() - a) + "\n");
-
+        System.out.println("Send Result to Client...\n");
         return j;
     }
 }

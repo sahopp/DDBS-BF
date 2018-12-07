@@ -8,7 +8,6 @@ import java.rmi.registry.Registry;
 public class MasterServerApplication {
 
     public static void main(String[] args) throws RemoteException, MalformedURLException, NotBoundException {
-        // TODO Auto-generated method stub
 
         System.out.println("\nSetting up MasterServer...");
         Registry registry5096 =LocateRegistry.createRegistry(5096);

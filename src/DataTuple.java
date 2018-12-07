@@ -9,10 +9,6 @@ public abstract class DataTuple implements Serializable, Comparable {
 
     }
 
-    public void setA1(int a1) {
-        A1 = a1;
-    }
-
     public int getA1() {
         return A1;
     }
